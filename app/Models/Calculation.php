@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Calculation extends Model
 {
@@ -12,9 +13,18 @@ class Calculation extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',
         'expression',
         'result',
     ];
+
+    /**
+     * Get the user that owns the calculation.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * Get the attributes that should be cast.

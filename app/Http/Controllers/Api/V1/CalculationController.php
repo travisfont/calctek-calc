@@ -7,13 +7,15 @@ use App\Http\Requests\StoreCalculationRequest;
 use App\Models\Calculation;
 use App\Services\CalculationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use InvalidArgumentException;
 
 class CalculationController extends Controller
 {
     public function __construct(
         private readonly CalculationService $calculationService
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of calculations.
@@ -33,10 +35,10 @@ class CalculationController extends Controller
      *     }
      * ]
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         // latest() orders by created_at descending, get() retrieves all of them without a limit.
-        return response()->json(Calculation::latest()->get());
+        return response()->json($request->user()->calculations()->latest()->get());
     }
 
     /**
@@ -80,11 +82,11 @@ class CalculationController extends Controller
 
         try {
             $result = $this->calculationService->calculate($expression);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
 
-        $calculation = Calculation::create([
+        $calculation = $request->user()->calculations()->create([
             'expression' => $expression,
             'result' => $result,
         ]);
@@ -101,9 +103,9 @@ class CalculationController extends Controller
      * Example Response:
      * HTTP/1.1 204 No Content
      */
-    public function destroy(string $id): \Illuminate\Http\Response
+    public function destroy(string $id, Request $request): Response
     {
-        $calculation = Calculation::findOrFail($id);
+        $calculation = $request->user()->calculations()->findOrFail($id);
         $calculation->delete();
 
         return response()->noContent();
@@ -118,9 +120,9 @@ class CalculationController extends Controller
      * Example Response:
      * HTTP/1.1 204 No Content
      */
-    public function clear(): \Illuminate\Http\Response
+    public function clear(Request $request): Response
     {
-        Calculation::truncate();
+        $request->user()->calculations()->delete();
 
         return response()->noContent();
     }

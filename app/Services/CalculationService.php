@@ -109,7 +109,7 @@ class CalculationService
 
             if ($isNegativeSign) {
                 $currentIndex++;
-                $numberStr = '-' . $this->extractNumber($expression, $currentIndex);
+                $numberStr = '-'.$this->extractNumber($expression, $currentIndex);
 
                 if ($numberStr === '-') {
                     throw new InvalidArgumentException('Invalid expression: stray negative sign.');
