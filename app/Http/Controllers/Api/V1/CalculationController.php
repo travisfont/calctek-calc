@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCalculationRequest;
+use App\Models\Calculation;
+use App\Services\CalculationService;
 use Illuminate\Http\JsonResponse;
 
 class CalculationController extends Controller
 {
     public function __construct(
-
+        private readonly CalculationService $calculationService
     ) {
     }
 
@@ -33,6 +35,8 @@ class CalculationController extends Controller
      */
     public function index(): JsonResponse
     {
+        // latest() orders by created_at descending, get() retrieves all of them without a limit.
+        return response()->json(Calculation::latest()->get());
     }
 
     /**
@@ -72,6 +76,20 @@ class CalculationController extends Controller
      */
     public function store(StoreCalculationRequest $request): JsonResponse
     {
+        $expression = (string) $request->validated('expression');
+
+        try {
+            $result = $this->calculationService->calculate($expression);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        $calculation = Calculation::create([
+            'expression' => $expression,
+            'result' => $result,
+        ]);
+
+        return response()->json($calculation, 201);
     }
 
     /**
@@ -85,6 +103,10 @@ class CalculationController extends Controller
      */
     public function destroy(string $id): \Illuminate\Http\Response
     {
+        $calculation = Calculation::findOrFail($id);
+        $calculation->delete();
+
+        return response()->noContent();
     }
 
     /**
@@ -98,5 +120,8 @@ class CalculationController extends Controller
      */
     public function clear(): \Illuminate\Http\Response
     {
+        Calculation::truncate();
+
+        return response()->noContent();
     }
 }
