@@ -4,3 +4,5 @@ Always enforce the following PHP CS Fixer rules for all future code changes in t
 
 - `braces_position`:
   - `anonymous_functions_opening_brace` must be set to `next_line_unless_newline_at_signature_end`.
+- `fully_qualified_strict_types`: `true`
+- `global_namespace_import`: `import_classes`, `import_constants`, and `import_functions` must be `true`.
