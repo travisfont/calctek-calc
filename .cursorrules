@@ -1,0 +1,6 @@
+# Custom Code Style Rules
+
+Always enforce the following PHP CS Fixer rules for all future code changes in this project:
+
+- `braces_position`:
+  - `anonymous_functions_opening_brace` must be set to `next_line_unless_newline_at_signature_end`.
