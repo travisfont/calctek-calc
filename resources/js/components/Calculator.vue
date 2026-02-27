@@ -97,7 +97,24 @@
   </div>
 </template>
 
-<script setup src="./Calculator.js"></script>
+<script setup>
+import useCalculator from './Calculator.js';
+
+const {
+  currentInput,
+  previousOperation,
+  history,
+  historyListRef,
+  appendNumber,
+  handleFocus,
+  handleBlur,
+  appendOperator,
+  deleteLast,
+  clearDisplay,
+  calculate,
+  toggleSign
+} = useCalculator();
+</script>
 
 <style scoped>
 /* Custom scrollbar for the ticker tape history */
