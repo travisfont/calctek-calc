@@ -220,7 +220,7 @@ fetch('http://127.0.0.1/api/v1/calculations', {
 Here is an explanation of all the migration files in this project. They can be broken down into two main categories: Laravel's standard boilerplate migrations and the custom migrations specific to your Calculator application.
 
 ### 1. Standard Laravel Boilerplate Migrations
-These migrations are included out of the box with a new Laravel installation to handle authentication, caching, queues, and API tokens.
+These migrations are included by default in a new Laravel installation to handle authentication, caching, queues, and API tokens.
 
 *   `0001_01_01_000000_create_users_table.php`
     *   **Description**: Creates the core authentication tables.
@@ -255,13 +255,12 @@ These migrations were specifically created for the project's business logic (man
     *   **Change**: Adds a boolean column called `is_guest` that defaults to `false`. This supports your application's guest token functionality, allowing you to differentiate between permanently registered users and temporary guest sessions without separating them into different tables.
 *   `2026_02_26_200645_add_user_id_to_calculations_table.php`
     *   **Description**: Alters the existing `calculations` table to link records to specific users.
-    *   **Change**: Adds a `user_id` foreign key column (positioned right after the `id` column). It is nullable and has a `cascadeOnDelete` constraint—meaning that if a user or guest account is deleted from the database, all their linked calculations will be automatically cleaned up and deleted alongside them.
+    *   **Change**: Adds a `user_id` foreign key column (positioned right after the `id` column). It is nullable and has a `cascadeOnDelete` constraint—meaning that if a user or guest account is deleted from the database, all their linked calculations will be automatically cleaned up and deleted along with it.
 
 ## JavaScript
 
 ### math.js
 
-#### Math.js
 > Is used on the frontend (Vue application) to securely and accurately parse and evaluate mathematical expressions entered by the user.
 
 Key advantages of using `math.js` in this project:
