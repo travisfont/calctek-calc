@@ -5,14 +5,14 @@
       class="w-full bg-[#1a1a1a] rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-[#262626] max-w-6xl"
       data-purpose="calculator-wrapper">
       <!-- BEGIN: CalculatorInterface -->
-      <section class="p-6 flex flex-col gap-6 w-full md:w-[450px] flex-shrink-0" data-purpose="calculator-keypad-section">
+      <section class="flex flex-col gap-6 w-full md:w-[450px] flex-shrink-0 pb-6" data-purpose="calculator-keypad-section">
         <!-- Display Area -->
-        <div class="p-8 text-right flex flex-col justify-end min-h-[120px]">
+        <div class="p-6 text-right flex flex-col justify-end min-h-[140px] bg-[#121212] border border-[#333] rounded-2xl mx-6 mt-6 mb-2 shadow-inner group transition-all duration-300 ring-1 ring-white/5">
           <div class="text-gray-500 text-sm h-6 overflow-hidden mb-1" id="prev-operation">{{ previousOperation }}</div>
-          <div class="text-6xl font-medium tracking-tight" id="display">{{ currentInput }}</div>
+          <div class="font-medium tracking-tight text-7xl font-semibold" id="display">{{ currentInput }}</div>
         </div>
         <!-- Buttons Grid -->
-        <div class="grid grid-cols-4 gap-3 p-6 pt-0" data-purpose="keypad-grid">
+        <div class="grid grid-cols-4 gap-3 pt-0 px-6" data-purpose="keypad-grid">
           <!-- Row 1 -->
           <button
             class="bg-[#333333] hover:bg-[#404040] text-gray-200 py-5 rounded-xl transition-all text-xl font-medium col-span-2"
@@ -57,8 +57,10 @@
             @click="appendOperator('+')">+</button>
           <!-- Row 5 -->
           <button
-            class="col-span-2 bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+            class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('0')">0</button>
+          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+            @click="toggleSign">+/-</button>
           <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('.')">.</button>
           <button
@@ -182,6 +184,16 @@ const addToHistory = (expr, res) => {
       history.value[index].isNew = false;
     }
   }, 1000);
+};
+
+const toggleSign = () => {
+  if (currentInput.value === '0' || currentInput.value === 'Error') return;
+  
+  if (currentInput.value.startsWith('-')) {
+    currentInput.value = currentInput.value.substring(1);
+  } else {
+    currentInput.value = '-' + currentInput.value;
+  }
 };
 </script>
 
