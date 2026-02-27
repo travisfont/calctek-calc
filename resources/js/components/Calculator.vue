@@ -9,7 +9,7 @@
         <!-- Display Area -->
         <div class="p-6 text-right flex flex-col justify-end min-h-[140px] bg-[#121212] border border-[#333] rounded-2xl mx-6 mt-6 mb-2 shadow-inner group transition-all duration-300 ring-1 ring-white/5">
           <div class="text-gray-500 text-sm h-6 overflow-hidden mb-1" id="prev-operation">{{ previousOperation }}</div>
-          <div class="font-medium tracking-tight text-7xl font-semibold" id="display">{{ currentInput }}</div>
+          <input type="text" class="font-medium tracking-tight text-4xl font-semibold bg-transparent border-none outline-none text-right w-full p-0 focus:ring-0" id="display" v-model="currentInput" @keyup.enter="calculate" />
         </div>
         <!-- Buttons Grid -->
         <div class="grid grid-cols-4 gap-3 pt-0 px-6" data-purpose="keypad-grid">
