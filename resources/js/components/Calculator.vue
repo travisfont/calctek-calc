@@ -72,8 +72,9 @@
       <!-- BEGIN: TickerTapeHistory -->
       <aside class="w-full bg-[#141414] p-8 border-t md:border-t-0 md:border-l border-[#262626] flex flex-col flex-1"
         data-purpose="history-sidebar">
-        <div class="mb-6 flex items-center justify-center">
+        <div class="mb-6 flex items-center justify-between">
           <h2 class="font-bold uppercase tracking-widest text-gray-500 text-lg">Calculator History</h2>
+          <button v-if="history.length > 0" @click="clearHistory" class="text-xs uppercase tracking-wider text-red-500 hover:text-red-400 transition-colors bg-red-500/10 hover:bg-red-500/20 px-3 py-1 rounded-md mb-0">Clear All</button>
         </div>
         <div class="ticker-tape ticker-scroll flex-1 overflow-y-auto space-y-4 pr-2 text-sm text-gray-400"
           id="history-list" ref="historyListRef">
@@ -81,10 +82,15 @@
             Tape is empty
           </div>
           <div v-else v-for="item in history" :key="item.id" 
-            class="border-b border-gray-800 pb-2" 
+            class="border-b border-gray-800 pb-2 relative group" 
             :class="{ 'animate-pulse': item.isNew }">
-            <div class="text-[10px] text-gray-500 mb-1">{{ item.time }}</div>
-            <div class="flex justify-between items-center">
+            <button @click="deleteCalculation(item.id)" class="absolute right-0 top-0 text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" title="Delete calculation">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div class="text-[10px] text-gray-500 mb-1 pr-6">{{ item.time }}</div>
+            <div class="flex justify-between items-center pr-6">
               <span class="truncate mr-2">{{ item.expression }}</span>
               <span class="text-emerald-400 font-bold">= {{ item.result }}</span>
             </div>
@@ -112,7 +118,9 @@ const {
   deleteLast,
   clearDisplay,
   calculate,
-  toggleSign
+  toggleSign,
+  deleteCalculation,
+  clearHistory
 } = useCalculator();
 </script>
 

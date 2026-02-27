@@ -180,6 +180,28 @@ export default function useCalculator() {
         }
     };
 
+    // delete a specific calculation from history
+    const deleteCalculation = async (id) => {
+        try {
+            await axios.delete(`/api/v1/calculations/${id}`);
+            // Remove the item from local state
+            history.value = history.value.filter(item => item.id !== id);
+        } catch (error) {
+            console.error('Failed to delete calculation', error);
+        }
+    };
+
+    // clear all calculations from history
+    const clearHistory = async () => {
+        try {
+            await axios.delete('/api/v1/calculations');
+            // Clear local state
+            history.value = [];
+        } catch (error) {
+            console.error('Failed to clear history', error);
+        }
+    };
+
     // return all the functions for export
     return {
         currentInput,
@@ -195,6 +217,8 @@ export default function useCalculator() {
         clearDisplay,
         calculate,
         addToHistory,
-        toggleSign
+        toggleSign,
+        deleteCalculation,
+        clearHistory
     };
 }
