@@ -139,14 +139,23 @@ const addToHistory = (expr, res) => {
 
 // toggle sign of current input
 // if current input is 0 or "Error", do nothing
-// if current input starts with "-", remove it
-// if current input does not start with "-", add it
+// toggles the sign of the last number in the expression
 const toggleSign = () => {
     if (currentInput.value === '0' || currentInput.value === 'Error') return;
 
-    if (currentInput.value.startsWith('-')) {
-        currentInput.value = currentInput.value.substring(1);
-    } else {
-        currentInput.value = '-' + currentInput.value;
+    const regex = /(^|[\+\-\*\/])(-?(?:\d+\.?\d*|\.\d*)(?:e[+-]?\d+)?)$/i;
+    const match = currentInput.value.match(regex);
+
+    if (match) {
+        const operator = match[1];
+        let number = match[2];
+
+        if (number.startsWith('-')) {
+            number = number.substring(1);
+        } else {
+            number = '-' + number;
+        }
+
+        currentInput.value = currentInput.value.slice(0, match.index) + operator + number;
     }
 };
