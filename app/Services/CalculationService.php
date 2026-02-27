@@ -2,10 +2,14 @@
 
 namespace App\Services;
 
+use App\Abstract\DivideTrait;
+use App\Abstract\IsNumberComponentTrait;
+use App\Abstract\IsOperatorTrait;
 use InvalidArgumentException;
 
 class CalculationService
 {
+    use DivideTrait, IsNumberComponentTrait, IsOperatorTrait;
     /**
      * Parses and evaluates a mathematical expression string.
      * Supports +, -, *, / and respects order of operations.
@@ -69,21 +73,7 @@ class CalculationService
         return $elements;
     }
 
-    /**
-     * Checks if a character is part of a number (digit or decimal point).
-     */
-    private function isNumberComponent(string $char): bool
-    {
-        return is_numeric($char) || $char === '.';
-    }
 
-    /**
-     * Checks if a character is a valid mathematical operator.
-     */
-    private function isOperator(string $char): bool
-    {
-        return in_array($char, ['+', '-', '*', '/', '^'], true);
-    }
 
     /**
      * Extracts a full number sequence starting from the current index.
@@ -294,19 +284,5 @@ class CalculationService
         }
 
         return array_pop($stack);
-    }
-
-    /**
-     * Perform division, ensuring no division by zero.
-     *
-     * @throws InvalidArgumentException
-     */
-    private function divide(float $operand1, float $operand2): float
-    {
-        if ($operand2 === 0.0) { // cannot forget this
-            throw new InvalidArgumentException('Division by zero is not allowed.');
-        }
-
-        return $operand1 / $operand2;
     }
 }
