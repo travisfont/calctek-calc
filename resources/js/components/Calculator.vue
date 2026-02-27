@@ -14,10 +14,10 @@
         <!-- Buttons Grid -->
         <div class="grid grid-cols-4 gap-3 pt-0 px-6" data-purpose="keypad-grid">
           <!-- Row 1 -->
-          <button
+          <button id="btn-clear"
             class="bg-[#333333] hover:bg-[#404040] text-gray-200 py-5 rounded-xl transition-all text-xl font-medium col-span-2"
             @click="clearDisplay">AC</button>
-          <button class="bg-[#333333] hover:bg-[#404040] text-gray-200 py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-delete" class="bg-[#333333] hover:bg-[#404040] text-gray-200 py-5 rounded-xl transition-all text-xl font-medium"
             @click="deleteLast">
             <svg class="h-6 w-6 mx-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg">
@@ -26,44 +26,44 @@
                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
             </svg>
           </button>
-          <button class="bg-[#1e3a5f] hover:bg-[#254a7a] text-[#38bdf8] py-5 rounded-xl transition-all text-2xl font-bold"
+          <button id="btn-divide" class="bg-[#1e3a5f] hover:bg-[#254a7a] text-[#38bdf8] py-5 rounded-xl transition-all text-2xl font-bold"
             @click="appendOperator('/')">÷</button>
           <!-- Row 2 -->
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-7" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('7')">7</button>
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-8" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('8')">8</button>
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-9" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('9')">9</button>
-          <button class="bg-[#1e3a5f] hover:bg-[#254a7a] text-[#38bdf8] py-5 rounded-xl transition-all text-2xl font-bold"
+          <button id="btn-multiply" class="bg-[#1e3a5f] hover:bg-[#254a7a] text-[#38bdf8] py-5 rounded-xl transition-all text-2xl font-bold"
             @click="appendOperator('*')">×</button>
           <!-- Row 3 -->
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-4" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('4')">4</button>
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-5" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('5')">5</button>
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-6" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('6')">6</button>
-          <button class="bg-[#1e3a5f] hover:bg-[#254a7a] text-[#38bdf8] py-5 rounded-xl transition-all text-2xl font-bold"
+          <button id="btn-subtract" class="bg-[#1e3a5f] hover:bg-[#254a7a] text-[#38bdf8] py-5 rounded-xl transition-all text-2xl font-bold"
             @click="appendOperator('-')">-</button>
           <!-- Row 4 -->
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-1" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('1')">1</button>
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-2" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('2')">2</button>
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-3" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('3')">3</button>
-          <button class="bg-[#1e3a5f] hover:bg-[#254a7a] text-[#38bdf8] py-5 rounded-xl transition-all text-2xl font-bold"
+          <button id="btn-add" class="bg-[#1e3a5f] hover:bg-[#254a7a] text-[#38bdf8] py-5 rounded-xl transition-all text-2xl font-bold"
             @click="appendOperator('+')">+</button>
           <!-- Row 5 -->
-          <button
+          <button id="btn-0"
             class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('0')">0</button>
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-toggle-sign" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="toggleSign">+/-</button>
-          <button class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
+          <button id="btn-decimal" class="bg-[#262626] hover:bg-[#333333] text-white py-5 rounded-xl transition-all text-xl font-medium"
             @click="appendNumber('.')">.</button>
-          <button
+          <button id="btn-calculate"
             class="text-white py-5 rounded-xl transition-all text-2xl font-bold bg-[#10b981] hover:bg-[#059669] shadow-[0_0_15px_rgba(16,185,129,0.4)]"
             @click="calculate">=</button>
         </div>
