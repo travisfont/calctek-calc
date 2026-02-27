@@ -120,7 +120,7 @@ When the `reorderElementsByPriority()` method organizes the parsed expression (u
 
 ### Shunting-Yard Parser Integration
 
-The **Shunting-Yard algorithm** (originally invented by Edsger Dijkstra) is a method for parsing mathematical expressions specified in infix notation (e.g., `3 + 4 * 2`) and converting them into postfix notation (also known as Reverse Polish Notation or RPN, e.g., `3 4 2 * +`).
+The [**Shunting-Yard algorithm**](https://en.wikipedia.org/wiki/Shunting_yard_algorithm) is a method for parsing mathematical expressions specified in infix notation (e.g., `3 + 4 * 2`) and converting them into postfix notation (also known as Reverse Polish Notation or RPN, e.g., `3 4 2 * +`).
 
 #### How it is Integrated
 
