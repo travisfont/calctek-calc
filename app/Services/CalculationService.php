@@ -50,9 +50,15 @@ class CalculationService
                 continue;
             }
 
-            if ($this->isOperator($char)) {
+            if ($this->isOperator($char) || $char === '(' || $char === ')') {
                 $previousElement = empty($elements) ? null : end($elements);
                 $elements[] = $this->extractOperatorOrNegativeNumber($expression, $previousElement, $currentIndex);
+
+                continue;
+            }
+
+            if (ctype_alpha($char)) {
+                $elements[] = $this->extractFunction($expression, $currentIndex);
 
                 continue;
             }
@@ -76,7 +82,7 @@ class CalculationService
      */
     private function isOperator(string $char): bool
     {
-        return in_array($char, ['+', '-', '*', '/'], true);
+        return in_array($char, ['+', '-', '*', '/', '^'], true);
     }
 
     /**
@@ -105,11 +111,11 @@ class CalculationService
         $char = $expression[$currentIndex];
 
         if ($char === '-') {
-            $isNegativeSign = $previousElement === null || $this->isOperator($previousElement);
+            $isNegativeSign = $previousElement === null || $this->isOperator($previousElement) || $previousElement === '(';
 
             if ($isNegativeSign) {
                 $currentIndex++;
-                $numberStr = '-'.$this->extractNumber($expression, $currentIndex);
+                $numberStr = '-' . $this->extractNumber($expression, $currentIndex);
 
                 if ($numberStr === '-') {
                     throw new InvalidArgumentException('Invalid expression: stray negative sign.');
@@ -122,6 +128,28 @@ class CalculationService
         $currentIndex++;
 
         return $char;
+    }
+
+    /**
+     * Extracts a mathematical function name.
+     *
+     * @throws InvalidArgumentException
+     */
+    private function extractFunction(string $expression, int &$currentIndex): string
+    {
+        $functionStr = '';
+        $length = strlen($expression);
+
+        while ($currentIndex < $length && ctype_alpha($expression[$currentIndex])) {
+            $functionStr .= $expression[$currentIndex];
+            $currentIndex++;
+        }
+
+        if (!in_array($functionStr, ['sqrt'])) {
+            throw new InvalidArgumentException("Unknown function: '{$functionStr}'");
+        }
+
+        return $functionStr;
     }
 
     /**
@@ -141,16 +169,36 @@ class CalculationService
             '-' => 1,
             '*' => 2,
             '/' => 2,
+            '^' => 3,
         ];
+
+        $rightAssociative = ['^'];
 
         foreach ($elements as $element) {
             if (is_numeric($element)) {
                 $output[] = $element;
+            } elseif (in_array($element, ['sqrt', '('], true)) {
+                $operators[] = $element;
+            } elseif ($element === ')') {
+                while (!empty($operators) && end($operators) !== '(') {
+                    $output[] = array_pop($operators);
+                }
+
+                if (empty($operators)) {
+                    throw new InvalidArgumentException('Mismatched parenthesis.');
+                }
+
+                array_pop($operators); // Discard '('
+
+                if (!empty($operators) && end($operators) === 'sqrt') {
+                    $output[] = array_pop($operators);
+                }
             } elseif (isset($operatorPriorities[$element])) {
                 $currentPriority = $operatorPriorities[$element];
+                $isRightAssociative = in_array($element, $rightAssociative, true);
 
                 // sets the order of operations by checking the priority of the last operator
-                while ($this->shouldPopOperator($operators, $operatorPriorities, $currentPriority)) {
+                while ($this->shouldPopOperator($operators, $operatorPriorities, $currentPriority, $isRightAssociative)) {
                     $output[] = array_pop($operators);
                 }
 
@@ -165,7 +213,11 @@ class CalculationService
         // sets the order of operations by checking the priority of the last operator
         // this is done after the loop to ensure that all operators are processed
         while (!empty($operators)) {
-            $output[] = array_pop($operators);
+            $op = array_pop($operators);
+            if ($op === '(' || $op === ')') {
+                throw new InvalidArgumentException('Mismatched parenthesis.');
+            }
+            $output[] = $op;
         }
 
         return $output;
@@ -178,7 +230,7 @@ class CalculationService
      * @param array<string, int> $operatorPriorities
      * @param int $currentPriority
      */
-    private function shouldPopOperator(array $operators, array $operatorPriorities, int $currentPriority): bool
+    private function shouldPopOperator(array $operators, array $operatorPriorities, int $currentPriority, bool $isRightAssociative = false): bool
     {
         if (empty($operators)) {
             return false;
@@ -188,6 +240,10 @@ class CalculationService
 
         if (!isset($operatorPriorities[$lastOperator])) {
             return false;
+        }
+
+        if ($isRightAssociative) {
+            return $operatorPriorities[$lastOperator] > $currentPriority;
         }
 
         return $operatorPriorities[$lastOperator] >= $currentPriority;
@@ -205,6 +261,15 @@ class CalculationService
         foreach ($orderedElements as $element) {
             if (is_numeric($element)) {
                 $stack[] = (float) $element;
+            } elseif ($element === 'sqrt') {
+                if (empty($stack)) {
+                    throw new InvalidArgumentException('Invalid expression format.');
+                }
+                $operand = array_pop($stack);
+                if ($operand < 0) {
+                    throw new InvalidArgumentException('Square root of negative number is not allowed.');
+                }
+                $stack[] = sqrt($operand);
             } else {
                 if (count($stack) < 2) {
                     throw new InvalidArgumentException('Invalid expression format.');
@@ -218,6 +283,7 @@ class CalculationService
                     '-' => $leftOperand - $rightOperand,
                     '*' => $leftOperand * $rightOperand,
                     '/' => $this->divide($leftOperand, $rightOperand),
+                    '^' => pow($leftOperand, $rightOperand),
                     default => throw new InvalidArgumentException("Unknown operator: '{$element}'"),
                 };
             }
