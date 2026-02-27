@@ -21,6 +21,7 @@ class AutoGuestAuthentication
     {
         // If the user is already authenticated via Sanctum, proceed normally.
         if (Auth::guard('sanctum')->check()) {
+            Auth::shouldUse('sanctum');
             return $next($request);
         }
 
@@ -29,8 +30,8 @@ class AutoGuestAuthentication
 
         // Create a new guest user
         $guestUser = User::create([
-            'name' => 'Guest User '.$uniq,
-            'email' => 'guest_'.$uniq.'@example.com',
+            'name' => 'Guest User ' . $uniq,
+            'email' => 'guest_' . $uniq . '@example.com',
             'password' => Hash::make(Str::random(16)),
             'is_guest' => true,
         ]);
@@ -38,8 +39,9 @@ class AutoGuestAuthentication
         // Generate a Sanctum token for the guest user
         $token = $guestUser->createToken('guest-token')->plainTextToken;
 
-        // Log the user in for the current request context
-        Auth::setUser($guestUser);
+        // Log the user in for the current request context on the sanctum guard
+        Auth::shouldUse('sanctum');
+        Auth::guard('sanctum')->setUser($guestUser);
 
         // Let the request proceed, but append our new header to the response
         $response = $next($request);

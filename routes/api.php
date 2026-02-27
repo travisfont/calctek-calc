@@ -6,13 +6,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request): JsonResponse
-{
+Route::get('/user', function (Request $request): JsonResponse {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::prefix('v1')->middleware([AutoGuestAuthentication::class, 'auth:sanctum'])->group(function (): void
-{
+Route::prefix('v1')->middleware([AutoGuestAuthentication::class])->group(function (): void {
     Route::get('/calculations', [CalculationController::class, 'index']);           // Display a listing of calculations
     Route::post('/calculations', [CalculationController::class, 'store']);          // Store a newly created calculation in the database
     Route::delete('/calculations/{id}', [CalculationController::class, 'destroy']); // Remove the specified calculation from the database
