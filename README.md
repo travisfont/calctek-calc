@@ -217,7 +217,7 @@ fetch('http://127.0.0.1/api/v1/calculations', {
 
 ## Migrations
 
-Here is an explanation of all the migration files in this project. They can be broken down into two main categories: Laravel's standard boilerplate migrations and the custom migrations specific to your Calculator application.
+Here is an explanation of all the migration files in this project. They can be broken down into two main categories: Laravel's standard boilerplate migrations and the custom migrations specific to this Calculator application.
 
 ### 1. Standard Laravel Boilerplate Migrations
 These migrations are included by default in a new Laravel installation to handle authentication, caching, queues, and API tokens.
@@ -230,12 +230,12 @@ These migrations are included by default in a new Laravel installation to handle
         *   `sessions`: Stores user session data when the application is configured to use the database session driver instead of files or cookies.
 *   `0001_01_01_000001_create_cache_table.php`
     *   **Description**: Sets up the infrastructure for database-driven caching.
-    *   **Tables Created**: `cache` and `cache_locks`. These allow Laravel to store cached data and manage resource locks directly in your database.
+    *   **Tables Created**: `cache` and `cache_locks`. These allow Laravel to store cached data and manage resource locks directly in the database.
 *   `0001_01_01_000002_create_jobs_table.php`
     *   **Description**: Prepares the database for background job processing (queues).
     *   **Tables Created**: `jobs`, `job_batches`, and `failed_jobs`. If you dispatch tasks to run in the background (like sending emails), these tables hold the job data until a queue worker processes them.
 *   `2026_02_25_224219_create_personal_access_tokens_table.php`
-    *   **Description**: Creates the `personal_access_tokens` table, which is used by **Laravel Sanctum**. This allows your API to issue and verify authentication tokens so users (or guests) can securely make requests to the calculator endpoints.
+    *   **Description**: Creates the `personal_access_tokens` table, which is used by **Laravel Sanctum**. This allows the API to issue and verify authentication tokens so users (or guests) can securely make requests to the calculator endpoints.
 
 ---
 
@@ -252,7 +252,7 @@ These migrations were specifically created for the project's business logic (man
         *   `timestamps`: Adds `created_at` and `updated_at`.
 *   `2026_02_26_200645_add_is_guest_to_users_table.php`
     *   **Description**: Alters the existing `users` table.
-    *   **Change**: Adds a boolean column called `is_guest` that defaults to `false`. This supports your application's guest token functionality, allowing you to differentiate between permanently registered users and temporary guest sessions without separating them into different tables.
+    *   **Change**: Adds a boolean column called `is_guest` that defaults to `false`. This supports the application's guest token functionality, allowing you to differentiate between permanently registered users and temporary guest sessions without separating them into different tables.
 *   `2026_02_26_200645_add_user_id_to_calculations_table.php`
     *   **Description**: Alters the existing `calculations` table to link records to specific users.
     *   **Change**: Adds a `user_id` foreign key column (positioned right after the `id` column). It is nullable and has a `cascadeOnDelete` constraint—meaning that if a user or guest account is deleted from the database, all their linked calculations will be automatically cleaned up and deleted along with it.
