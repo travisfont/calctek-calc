@@ -59,7 +59,7 @@ Follow these steps to set up the project locally:
    ```bash
    php artisan serve
    ```
-   The application will be accessible at `http://localhost:8000`.
+   The application will be accessible at `http://localhost`.
 
 8. **Run Tests:**
    Execute the test suite to ensure everything is working correctly.
@@ -151,7 +151,7 @@ The integration in `CalculationService` is broken down into a clean, three-step 
    The primary reason for using this algorithm is to respect standard mathematical precedence. Without it, a simple left-to-right parser would calculate `3 + 4 * 2` as `14` `((3 + 4) * 2)` instead of the mathematically correct `11` `(3 + (4 * 2))`. The Shunting-Yard stack logic naturally handles this prioritization.
 
 2. **Security (Avoiding `eval()`)**
-   In PHP, the easiest (and most dangerous) way to calculate a string expression is using the built-in `eval()` function or passing it directly to a database query. However, parsing arbitrary user strings through `eval()` is a massive security vulnerability (Remote Code Execution). By building a Shunting-Yard parser, we ensure that the application only ever processes strict numbers and allowed operators (`+`, `-`, `*`, `/`), making it completely secure against injection attacks.
+   In PHP, the easiest (and most dangerous) way to evaluate a string expression is to use the built-in `eval()` function or to pass it directly to a database query. However, parsing arbitrary user strings through `eval()` is a massive security vulnerability (Remote Code Execution). By building a Shunting-Yard parser, we ensure that the application processes only strict numbers and the allowed operators (`+`, `-`, `*`, `/`), making it completely secure against injection attacks.
 
 3. **Separation of Concerns & Maintainability**
    By breaking the process into tokenization -> conversion (Shunting-Yard) -> evaluation, the code is highly modular. If we ever wanted to add support for parentheses `()` or exponents `^`, we only have to update the tokenization and the priority weights. The evaluation logic would largely remain untouched.
@@ -160,11 +160,11 @@ The integration in `CalculationService` is broken down into a clean, three-step 
 
 ### AutoGuestAuthentication
 
-The `AutoGuestAuthentication` middleware is designed to seamlessly handle public visitors to the API while still maintaining strict calculation history isolation. Instead of forcing users to explicitly register or log in to use the calculator, the API natively handles it behind the scenes.
+The `AutoGuestAuthentication` middleware is designed to seamlessly handle public visitors to the API while maintaining strict isolation of calculation history. Instead of forcing users to explicitly register or log in to use the calculator, the API handles registration and authentication behind the scenes.
 
 #### How It Works
 
-`AutoGuestAuthentication` acts as a standalone authenticating middleware for the API (replacing the standard `auth:sanctum` middleware, which would otherwise prematurely throw a `401 Unauthenticated` exception due to middleware priority before a guest could be created).
+`AutoGuestAuthentication` acts as a standalone authentication middleware for the API (replacing the standard `auth:sanctum` middleware, which would otherwise prematurely throw a `401 Unauthenticated` exception due to its higher middleware priority before a guest could be created).
 
 When an incoming request hits the API:
 1. **If a valid Sanctum token is provided:** The middleware detects it (`Auth::guard('sanctum')->check()`), sets the default guard to Sanctum (`Auth::shouldUse('sanctum')`), and allows the request to proceed normally.
@@ -182,7 +182,7 @@ For the client application to correctly utilize this guest system, it must save 
 When the user visits the app for the first time and performs an action (like submitting a calculation), make an unauthenticated request. The server will respond with the calculated result AND the `X-Guest-Token`.
 
 ```javascript
-fetch('http://127.0.0.1:8000/api/v1/calculations', {
+fetch('http://127.0.0.1/api/v1/calculations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ expression: "10 + 20" })
@@ -204,7 +204,7 @@ Once the token is saved, all future requests (like fetching their history) must 
 // Retrieve the token from storage
 const token = localStorage.getItem('calculator_token');
 
-fetch('http://127.0.0.1:8000/api/v1/calculations', {
+fetch('http://127.0.0.1/api/v1/calculations', {
     method: 'GET',
     headers: { 
         'Accept': 'application/json',
@@ -220,7 +220,7 @@ fetch('http://127.0.0.1:8000/api/v1/calculations', {
 Here is an explanation of all the migration files in this project. They can be broken down into two main categories: Laravel's standard boilerplate migrations and the custom migrations specific to your Calculator application.
 
 ### 1. Standard Laravel Boilerplate Migrations
-These migrations come out-of-the-box with a new Laravel installation to handle authentication, caching, queues, and API tokens.
+These migrations are included out of the box with a new Laravel installation to handle authentication, caching, queues, and API tokens.
 
 *   `0001_01_01_000000_create_users_table.php`
     *   **Description**: Creates the core authentication tables.
@@ -241,7 +241,7 @@ These migrations come out-of-the-box with a new Laravel installation to handle a
 
 ### 2. Custom Application Migrations
 
-These are the migrations created specifically for the business logic of your project (managing calculation history and tying it to users/guests).
+These migrations were specifically created for the project's business logic (managing calculation history and tying it to users/guests).
 
 *   `2026_02_25_224257_create_calculations_table.php`
     *   **Description**: Creates the main table for storing calculation history.
@@ -255,7 +255,7 @@ These are the migrations created specifically for the business logic of your pro
     *   **Change**: Adds a boolean column called `is_guest` that defaults to `false`. This supports your application's guest token functionality, allowing you to differentiate between permanently registered users and temporary guest sessions without separating them into different tables.
 *   `2026_02_26_200645_add_user_id_to_calculations_table.php`
     *   **Description**: Alters the existing `calculations` table to link records to specific users.
-    *   **Change**: Adds a `user_id` foreign key column (positioned right after the `id` column). It is nullable and has a `cascadeOnDelete` constraint—meaning that if a user or guest account is deleted from the database, all of their linked calculations will automatically be cleaned up and deleted alongside them.
+    *   **Change**: Adds a `user_id` foreign key column (positioned right after the `id` column). It is nullable and has a `cascadeOnDelete` constraint—meaning that if a user or guest account is deleted from the database, all their linked calculations will be automatically cleaned up and deleted alongside them.
 
 ## JavaScript
 
@@ -267,7 +267,7 @@ These are the migrations created specifically for the business logic of your pro
 Key advantages of using `math.js` in this project:
 1. **Security**: It evaluates mathematical string inputs (like `10 + 20` or complex nested brackets like `sqrt((((9*9)/12)+(13-4))*2)^2)`) securely without relying on JavaScript's native and dangerous `eval()` function, eliminating XSS and code injection risks on the client side.
 2. **Advanced Functions**: It provides robust out-of-the-box support for advanced mathematical operations (such as square roots `sqrt()` and exponents `^`), complex expressions, and correct order of operations.
-3. **Precision**: Standard JavaScript floating-point arithmetic is notoriously inaccurate (e.g., `0.1 + 0.2` yielding `0.30000000000000004`). `math.js` provides tools for precise calculations, preventing visual bugs when users calculate decimals.
+3. **Precision**: Standard JavaScript floating-point arithmetic is notoriously inaccurate (e.g., `0.1 + 0.2` yielding `0.30000000000000004`). `math.js` provides tools for precise calculations, preventing visual bugs when users perform decimal calculations.
 
 
 ## Rules / CS Fixer
@@ -277,7 +277,7 @@ Key advantages of using `math.js` in this project:
 - /.cursorrules
 
 **braces_position** = next_line_unless_newline_at_signature_end
-> When defining functions { and } are on their on lines (for readability)
+> When defining functions { and } are on their own lines (for readability)
 
 **fully_qualified_strict_types** = true
 > All types must be fully qualified (for readability)
