@@ -9,7 +9,7 @@
         <!-- Display Area -->
         <div class="p-6 text-right flex flex-col justify-end min-h-[140px] bg-[#121212] border border-[#333] rounded-2xl mx-6 mt-6 mb-2 shadow-inner group transition-all duration-300 ring-1 ring-white/5">
           <div class="text-gray-500 text-sm h-6 overflow-hidden mb-1" id="prev-operation">{{ previousOperation }}</div>
-          <input type="text" class="font-medium tracking-tight text-4xl font-semibold bg-transparent border-none outline-none text-right w-full p-0 focus:ring-0" id="display" v-model="currentInput" @keyup.enter="calculate" />
+          <input type="text" class="font-medium tracking-tight text-4xl font-semibold bg-transparent border-none outline-none text-right w-full p-0 focus:ring-0" id="display" v-model="currentInput" @keyup.enter="calculate" @focus="handleFocus" @blur="handleBlur" />
         </div>
         <!-- Buttons Grid -->
         <div class="grid grid-cols-4 gap-3 pt-0 px-6" data-purpose="keypad-grid">
@@ -99,6 +99,7 @@
 
 <script setup>
 import { ref, nextTick } from 'vue';
+import { evaluate } from 'mathjs';
 
 const currentInput = ref('0');
 const previousOperation = ref('');
@@ -113,6 +114,18 @@ const appendNumber = (num) => {
   } else {
     if (num === '.' && currentInput.value.includes('.')) return;
     currentInput.value += num;
+  }
+};
+
+const handleFocus = () => {
+  if (currentInput.value === '0') {
+    currentInput.value = '';
+  }
+};
+
+const handleBlur = () => {
+  if (currentInput.value.trim() === '') {
+    currentInput.value = '0';
   }
 };
 
@@ -146,9 +159,12 @@ const clearDisplay = () => {
 const calculate = () => {
   try {
     const expression = currentInput.value;
-    const result = Function('"use strict";return (' + expression + ')')();
     
-    const formattedResult = Number.isInteger(result) ? result : parseFloat(result.toFixed(8));
+    // Evaluate the expression using mathjs
+    let result = evaluate(expression);
+    
+    // Format to avoid long decimal trails if necessary, but keep precision high
+    const formattedResult = Number.isInteger(result) ? result : parseFloat(Number(result).toFixed(8));
     
     addToHistory(expression, formattedResult);
     
