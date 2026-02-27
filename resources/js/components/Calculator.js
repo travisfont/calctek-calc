@@ -1,5 +1,5 @@
-import { ref, nextTick } from 'vue';
-import { evaluate } from 'mathjs';
+import { ref, nextTick, onMounted } from 'vue';
+import axios from 'axios';
 
 export default function useCalculator() {
     const currentInput = ref('0');         // current input
@@ -7,6 +7,23 @@ export default function useCalculator() {
     const shouldResetDisplay = ref(false); // reset display
     const history = ref([]);               // history
     const historyListRef = ref(null);      // history list
+
+    // load history from API on mount
+    onMounted(async () => {
+        try {
+            const response = await axios.get('/api/v1/calculations');
+
+            history.value = response.data.map(item => ({
+                id: item.id,
+                time: new Date(item.created_at).toLocaleTimeString(),
+                expression: item.expression,
+                result: item.result,
+                isNew: false
+            }));
+        } catch (error) {
+            console.error('Failed to load history', error);
+        }
+    });
 
     // append number to current input
     // if current input is 0, replace it with the number
@@ -85,17 +102,19 @@ export default function useCalculator() {
     // if the expression is valid, add it to the history
     // if the expression is invalid, set the current input to "Error"
     // if the current input is "Error", clear it after 1.5 seconds
-    const calculate = () => {
+    const calculate = async () => {
         try {
             const expression = currentInput.value;
 
-            // Evaluate the expression using mathjs
-            let result = evaluate(expression);
+            // Evaluate the expression using the API
+            const response = await axios.post('/api/v1/calculations', {
+                expression: expression
+            });
 
-            // Format to avoid long decimal trails if necessary, but keep precision high
-            const formattedResult = Number.isInteger(result) ? result : parseFloat(Number(result).toFixed(8));
+            const resultData = response.data;
+            const formattedResult = resultData.result;
 
-            addToHistory(expression, formattedResult);
+            addToHistory(expression, formattedResult, resultData.id, resultData.created_at);
 
             previousOperation.value = expression + ' =';
             currentInput.value = formattedResult.toString();
@@ -110,10 +129,10 @@ export default function useCalculator() {
     // if the history is empty, add the new item to the history
     // if the history is not empty, add the new item to the history
     // if the history has more than 10 items, remove the oldest item
-    const addToHistory = (expr, res) => {
+    const addToHistory = (expr, res, apiId = null, apiTime = null) => {
         const newItem = {
-            id: Date.now(),
-            time: new Date().toLocaleTimeString(),
+            id: apiId || Date.now(),
+            time: apiTime ? new Date(apiTime).toLocaleTimeString() : new Date().toLocaleTimeString(),
             expression: expr,
             result: res,
             isNew: true
@@ -161,6 +180,7 @@ export default function useCalculator() {
         }
     };
 
+    // return all the functions for export
     return {
         currentInput,
         previousOperation,
