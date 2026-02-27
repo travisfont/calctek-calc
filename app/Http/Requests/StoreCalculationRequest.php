@@ -23,7 +23,7 @@ class StoreCalculationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'expression' => ['required', 'string', 'regex:/^[0-9\s.+*\/-]+$/'],
+            'expression' => ['required', 'string', 'regex:/^[a-zA-Z0-9\s.+*\/\-()^]+$/'],
         ];
     }
 }
